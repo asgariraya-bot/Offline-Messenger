@@ -1,6 +1,6 @@
 #include "LocalUser.h"
 #include <iostream>
-
+#include "UserManager.h"
 using namespace std;
 
 LocalUser::LocalUser(const User& user) : User(user) {}

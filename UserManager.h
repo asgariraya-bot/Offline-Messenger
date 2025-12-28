@@ -6,6 +6,7 @@
 #include "LocalUser.h"
 
 #include <exception>
+class LocalUser;
 
 class UserAlreadyExistsException : public std::exception 
 {

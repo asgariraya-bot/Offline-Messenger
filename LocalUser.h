@@ -2,6 +2,7 @@
 #include "User.h"
 #include "UserManager.h"
 #include <string>
+class UserManager;
 
 class LocalUser : public User 
 {
