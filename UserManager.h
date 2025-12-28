@@ -1,35 +1,52 @@
 #pragma once
-#include <string>
+
 #include <vector>
+#include <string>
 #include "User.h"
+#include "LocalUser.h"
 
-using namespace std;
+#include <exception>
 
-class UserManager
- {
+class UserAlreadyExistsException : public std::exception 
+{
+public:
+    const char* what() const noexcept override {
+        return "Username already exists.";
+    }
+};
+
+class UserNotFoundException : public std::exception 
+{
+public:
+    const char* what() const noexcept override {
+        return "User not found.";
+    }
+};
+
+class IncorrectPasswordException : public std::exception 
+{
+public:
+    const char* what() const noexcept override {
+        return "Incorrect password.";
+    }
+};
+
+class UserManager 
+{
 private:
-    vector<User> users;
-    string filename;
+    std::vector<User> users;
 
-    bool usernameExists(const string& username) const;
-    void loadFromFile();
-    void saveToFile() const;
+    int generateNewId() const;
 
 public:
-    UserManager(const string& file);
+    UserManager();
+    void loadUsers(const std::string& filename);
+    void saveUsers(const std::string& filename) const;
 
-    void signUp(const string& username,
-                const string& fullName,
-                const string& birthDate,
-                const string& password);
+    void signUp(const std::string& username, const std::string& fullname, const std::string& birthdate, const std::string& password, const std::string& joinDate);
 
-    User login(const string& username, const string& password);
+    LocalUser login(const std::string& username,  const std::string& password);
+        User* findUserInternal(const std::string& username);
 
-    vector<User> searchUser(const string& keyword) const;
-
-    void sortUsersByUsername();
-    void sortUsersByFullName();
-    void sortUsersById();
-
-    const vector<User>& getAllUsers() const;
+    std::vector<User> getAllUsers() const;
 };

@@ -1,78 +1,84 @@
 #include "UserManager.h"
 #include <fstream>
+#include <sstream>
 #include <algorithm>
-#include <stdexcept>
 
 using namespace std;
 
-UserManager::UserManager(const string& file) : filename(file) {
-    ifstream fin(filename);
-    long int userId;
-    string userName, name, password;
-    int birthDate, loginData;
+UserManager::UserManager() {}
 
-    while (fin >> userId >> userName >> name >> birthDate >> password >> loginData) {
-        users.emplace_back(userId, userName, name, birthDate, password, loginData);
+int UserManager::generateNewId() const {
+    if (users.empty())
+        return 1;
+    return users.back().getId() + 1;
+}
+
+User* UserManager::findUserInternal(const string& username) {
+    for (auto& user : users) {
+        if (user.getUsername() == username)
+            return &user;
+    }
+    return nullptr;
+}
+void UserManager::loadUsers(const string& filename) {
+    ifstream file(filename);
+    if (!file.is_open())
+        return;
+
+    users.clear();
+    string line;
+
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string idStr, username, fullname, birthdate, password, joinDate;
+
+        getline(ss, idStr, '|');
+        getline(ss, username, '|');
+        getline(ss, fullname, '|');
+        getline(ss, birthdate, '|');
+        getline(ss, password, '|');
+        getline(ss, joinDate, '|');
+
+        users.emplace_back(
+            stoi(idStr),
+            username,
+            fullname,
+            birthdate,
+            password,
+            joinDate
+        );
     }
 }
 
-bool UserManager::usernameExists(const string& username) const {
-    return any_of(users.begin(), users.end(), [&](const User& u){ 
-        return u.getUserName() == username; 
-    });
+void UserManager::saveUsers(const string& filename) const {
+    ofstream file(filename);
+    for (const auto& user : users)
+    {
+        file << user.getId() << "|"<< user.getUsername() << "|" << user.getFullname() << "|" << user.getBirthdate() << "|"<< "*****" << "|" << user.getJoinDate() << endl;
+    }
 }
 
-void UserManager::signUp(const string& username, const string& name,
-                         const string& birthDate, const string& password) {
-    if(usernameExists(username)) throw runtime_error("Username already exists!");
+void UserManager::signUp(const string& username, const string& fullname, const string& birthdate,const string& password,const string& joinDate) {
+    if (findUserInternal(username))
+        throw UserAlreadyExistsException();
 
-    long int newId = users.empty() ? 1 : users.back().getUserId() + 1;
-    users.emplace_back(newId, username, name, stoi(birthDate), password, 0);
-
-    ofstream fout(filename);
-    for(const auto &u : users)
-        fout << u.getUserId() << ' ' << u.getUserName() << ' ' << u.getName() << ' '
-             << u.getUserBirthday() << ' ' << u.getUserPassword() << ' ' << u.getLoginData() << '\n';
+    int newId = generateNewId();
+    users.emplace_back(newId, username, fullname, birthdate, password, joinDate);
 }
 
-User UserManager::login(const string& username, const string& password) {
-    auto it = find_if(users.begin(), users.end(), [&](const User& u){ 
-        return u.getUserName() == username; 
-    });
+LocalUser UserManager::login(const string& username,const string& password) 
+{
+    User* user = findUserInternal(username);
 
-    if(it == users.end()) throw runtime_error("Username does not exist!");
-    if(it->getUserPassword() != password) throw runtime_error("Incorrect password!");
-    return *it;
+    if (!user)
+        throw UserNotFoundException();
+
+    if (!user->checkPassword(password))
+        throw IncorrectPasswordException();
+
+    return LocalUser(*user);
 }
-
-vector<User> UserManager::searchUser(const string& keyword) const {
-    vector<User> result;
-    copy_if(users.begin(), users.end(), back_inserter(result),
-            [&](const User& u){
-                return u.getUserName().find(keyword) != string::npos ||
-                       u.getName().find(keyword) != string::npos;
-            });
-    return result;
-}
-
-void UserManager::sortUsersByUsername() {
-    sort(users.begin(), users.end(), [](const User& a,const User& b){
-        return a.getUserName() < b.getUserName();
-    });
-}
-
-void UserManager::sortUsersByFullName() {
-    sort(users.begin(), users.end(), [](const User& a,const User& b){
-        return a.getName() < b.getName();
-    });
-}
-
-void UserManager::sortUsersById() {
-    sort(users.begin(), users.end(), [](const User& a,const User& b){
-        return a.getUserId() < b.getUserId();
-    });
-}
-
-const vector<User>& UserManager::getAllUsers() const {
+vector<User> UserManager::getAllUsers() const 
+{
     return users;
 }
