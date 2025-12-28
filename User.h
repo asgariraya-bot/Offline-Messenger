@@ -1,48 +1,38 @@
 #pragma once
-#include<iostream>
-#include<vector>
-#include<string>
+#include <iostream>
+#include <string>
 
 using namespace std;
 
 class User
 {
-long int UserId;
-string UserName;
-string Name;
-int UserBirthday;
-string UserPassword;
-int LoginData;
+private:
+    long int userId;
+    string username;
+    string fullName;
+    string birthDate;
+    string password;
+    int joinData;
 
 public:
+    User(long int id, const string& uname = "", const string& name = "", 
+         const string& bdate = "", const string& pass = "", int join = 0)
+        : userId(id), username(uname), fullName(name), birthDate(bdate), password(pass), joinData(join) {}
 
-User(long int UserId,string UserName="",string Name="",int UserBirthday=0,string UserPassword="",int LoginData=0)
-: UserId(UserId), UserName(UserName), Name(Name), UserBirthday(UserBirthday) , UserPassword(UserPassword), LoginData(LoginData){}
+    virtual ~User() {}
 
-virtual~User(){};
+    long int getUserId() const { return userId; }
+    string getUserName() const { return username; }
+    string getName() const { return fullName; }
+    string getBirthDate() const { return birthDate; }
+    string getPassword() const { return password; }
+    int getjoinData() const { return joinData; }
 
+    void print() const {
+        cout << "UserId: " << userId << " " << "UserName: " << username << " "<< "Name: " << fullName << " " << "BirthDate: " << birthDate << " " << "Password: " << password << " " << "joinData: " << joinData << endl;
+    }
 
-long int getUserId() const{return UserId;}
-string getUserName() const { return UserName; }
-string getName() const { return Name; }
-int getUserBirthday() const { return UserBirthday; }
-string getUserPassword() const { return UserPassword; }
-int getLoginData() const { return LoginData; }
-
-void print()const
-{
-    cout<< "UserId:"<<UserId<<"\n"
-    <<"UserName:"<<UserName<<"\n"
-    <<"Name:"<<Name<<"\n"
-    <<"UserBirthday:"<<UserBirthday<<"\n"
-    <<"UserPassword:"<<UserPassword<<"\n"
-    <<"LoginData:"<<LoginData<<endl;
-}
-bool checkPassword(const string& Password )const
-{
-    if(UserPassword==Password)
-    return true;
-return false;
-}
-
+    bool checkPassword(const string& pass) const {
+        return password == pass;
+    }
 };
