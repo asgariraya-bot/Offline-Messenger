@@ -1,38 +1,27 @@
 #pragma once
-#include <iostream>
 #include <string>
-
 using namespace std;
-
-class User
-{
-private:
-    long int userId;
+class User {
+protected:
+    int id;
     string username;
-    string fullName;
-    string birthDate;
+    string fullname;
+    string birthdate;
     string password;
-    int joinData;
+    string joinDate;
 
 public:
-    User(long int id, const string& uname = "", const string& name = "", 
-         const string& bdate = "", const string& pass = "", int join = 0)
-        : userId(id), username(uname), fullName(name), birthDate(bdate), password(pass), joinData(join) {}
+    User(int id, const std::string& username, const std::string& fullname, const std::string& birthdate, const std::string& password, const std::string& joinDate);
 
-    virtual ~User() {}
+    virtual ~User() = default;
 
-    long int getUserId() const { return userId; }
-    string getUserName() const { return username; }
-    string getName() const { return fullName; }
-    string getBirthDate() const { return birthDate; }
-    string getPassword() const { return password; }
-    int getjoinData() const { return joinData; }
+    int getId() const;
+    string getUsername() const;
+   string getFullname() const;
+    string getBirthdate() const;
+    string getJoinDate() const;
 
-    void print() const {
-        cout << "UserId: " << userId << " " << "UserName: " << username << " "<< "Name: " << fullName << " " << "BirthDate: " << birthDate << " " << "Password: " << password << " " << "joinData: " << joinData << endl;
-    }
+    virtual void displayInfo() const;
+    bool checkPassword(const string& pass) const;
 
-    bool checkPassword(const string& pass) const {
-        return password == pass;
-    }
 };
