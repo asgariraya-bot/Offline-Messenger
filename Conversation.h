@@ -1,28 +1,26 @@
 #pragma once
-#include <iostream>
 #include <vector>
 #include <string>
-#include <algorithm>
+#include "Message.h"
 
-using namespace std;
-
-class Conversations 
-{
+class Conversation {
 protected:
-    long int ConversationsId;
-    vector<long int> participantIds;
-    string NameOfConversations;
+    int conversationId;
+    std::vector<int> participants; 
+    std::vector<Message*> messages;
+    std::string name;
 
 public:
-    Conversations(long int ConversationsId, vector<long int> participantIds, string NameOfConversations)
-        : ConversationsId(ConversationsId), participantIds(participantIds), NameOfConversations(NameOfConversations) {}
+    Conversation(int conversationId, const std::vector<int>& participants, const std::string& name);
+    virtual ~Conversation();
 
-    virtual ~Conversations() {}
-    virtual void print() const = 0;
-    long int getId() const { return ConversationsId; }
-    vector<long int> getParticipants() const { return participantIds; }
-    string getName() const { return NameOfConversations; }
-    bool hasUser(long int userId) const {
-        return find(participantIds.begin(), participantIds.end(), userId) != participantIds.end();
-    }
+    int getId() const;
+    std::string getName() const;
+    const std::vector<int>& getParticipants() const;
+    const std::vector<Message*>& getMessages() const;
+
+    void addMessage(Message* msg);
+    void displayMessages() const;
+
+    virtual std::string toString() const;
 };

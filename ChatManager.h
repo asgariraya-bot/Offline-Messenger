@@ -1,27 +1,27 @@
 #pragma once
 #include <vector>
+#include <string>
 #include "Conversation.h"
+#include "PrivateChat.h"
+#include "Message.h"
+#include <stdexcept>
 
-using namespace std;
-
-class ChatManager 
-{
+class ChatManager {
 private:
-    vector<Conversations*> conversations;
+    std::vector<Conversation*> chats;
+    int generateNewConversationId() const;
 
 public:
-    ChatManager() {}
+    ChatManager();
+    ~ChatManager();
 
-    vector<Conversations*>& getAllConversations() {
-        return conversations;
-    }
+    PrivateChat* createPrivateChat(int user1Id, int user2Id, const std::string& user2Name);
 
-    vector<Conversations*> getUserConversations(long int userId) {
-        vector<Conversations*> result;
-        for(auto conv : conversations) {
-            if(conv->hasUser(userId))
-                result.push_back(conv);
-        }
-        return result;
-    }
+    std::vector<Conversation*> getUserConversations(int userId) const;
+    void addMessageToChat(int conversationId, Message* msg);
+
+    void displayAllChats() const;
+
+    void saveChats(const std::string& filename) const;
+    void loadChats(const std::string& filename);
 };

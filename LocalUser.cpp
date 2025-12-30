@@ -5,7 +5,7 @@ using namespace std;
 
 LocalUser::LocalUser(const User& user) : User(user) {}
 
-void LocalUser::showDashboard(UserManager& userManager) 
+void LocalUser::showDashboard(UserManager& userManager, ChatManager& chatManager) 
 {
     int choice = -1;
 
@@ -13,7 +13,7 @@ void LocalUser::showDashboard(UserManager& userManager)
         cout << "\nUSER DASHBOARD\n";
         cout << "Logged in as: " << username << "\n";
         cout << "1. View users\n";
-        cout << "2. Send message\n";
+        cout << "2. creat privet chat\n";
         cout << "3. View conversations\n";
         cout << "0. Logout\n";
         cout << "Choose: ";
@@ -26,7 +26,7 @@ void LocalUser::showDashboard(UserManager& userManager)
                 break;
 
             case 2:
-                sendMessage(userManager);
+                creatPrivetChat(userManager);
                 break;
 
             case 3:
@@ -53,8 +53,10 @@ void LocalUser::viewUsers(UserManager& userManager) const {
     }
 }
 
-void LocalUser::sendMessage(UserManager& userManager) {
-    string receiverUsername, text;
+void LocalUser::creatPrivetChat(UserManager& userManager) {
+    string receiverUsername, text, voice;
+    cout<<"chose type of message:"<<endl;
+    //? how shoulde i /
     cout << "Receiver username: ";
     getline(cin, receiverUsername);
 
@@ -64,7 +66,8 @@ void LocalUser::sendMessage(UserManager& userManager) {
 
         cout << "Message text: ";
         getline(cin, text);
-
+        // cout<<"Message voice:"<<endl;
+        // getline(cin,voice);
         cout << "\n[TEXT MESSAGE SENT]\n";
         cout << "From: " << username << "\n";
         cout << "To: " << receiverUsername << "\n";

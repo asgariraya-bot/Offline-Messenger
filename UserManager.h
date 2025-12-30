@@ -4,7 +4,6 @@
 #include <string>
 #include "User.h"
 #include "LocalUser.h"
-
 #include <exception>
 class LocalUser;
 
@@ -31,14 +30,16 @@ public:
         return "Incorrect password.";
     }
 };
+enum class UserSortType { BY_NAME, BY_JOIN_DATE, BY_ID };
 
 class UserManager 
 {
 private:
     std::vector<User> users;
+    bool isValidDate(const std::string& date) const;
 
     int generateNewId() const;
-
+    
 public:
     UserManager();
     void loadUsers(const std::string& filename);
@@ -50,4 +51,7 @@ public:
         User* findUserInternal(const std::string& username);
 
     std::vector<User> getAllUsers() const;
+    
+    void displayUsers(const std::string& search = "", UserSortType sortType = UserSortType::BY_NAME) const;
+
 };

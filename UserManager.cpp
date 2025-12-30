@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include<iostream>
 
 using namespace std;
 
@@ -61,9 +62,11 @@ void UserManager::saveUsers(const string& filename) const {
 void UserManager::signUp(const string& username, const string& fullname, const string& birthdate,const string& password,const string& joinDate) {
     if (findUserInternal(username))
         throw UserAlreadyExistsException();
-
+    if (!isValidDate(birthdate) || !isValidDate(joinDate))
+        throw std::invalid_argument("Invalid date format.");
     int newId = generateNewId();
     users.emplace_back(newId, username, fullname, birthdate, password, joinDate);
+    
 }
 
 LocalUser UserManager::login(const string& username,const string& password) 
@@ -81,4 +84,13 @@ LocalUser UserManager::login(const string& username,const string& password)
 vector<User> UserManager::getAllUsers() const 
 {
     return users;
+}
+bool UserManager::isValidDate(const std::string& date) const {
+    if (date.size() != 10) return false;
+    if (date[4] != '-' || date[7] != '-') return false;
+    for (size_t i = 0; i < date.size(); ++i) {
+        if (i == 4 || i == 7) continue;
+        if (!isdigit(date[i])) return false;
+    }
+    return true;
 }
