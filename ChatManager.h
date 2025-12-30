@@ -9,17 +9,17 @@
 class ChatManager {
 private:
     std::vector<Conversation*> chats;
-    int generateNewConversationId() const;
 
 public:
     ChatManager();
     ~ChatManager();
+        int generateNewConversationId() const;
 
     PrivateChat* createPrivateChat(int user1Id, int user2Id, const std::string& user2Name);
 
     std::vector<Conversation*> getUserConversations(int userId) const;
     void addMessageToChat(int conversationId, Message* msg);
-
+    
     void displayAllChats() const;
 
     void saveChats(const std::string& filename) const;

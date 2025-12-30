@@ -1,19 +1,34 @@
 #include "LocalUser.h"
 #include <iostream>
-#include "UserManager.h"
+#include "TextMessage.h"
+#include "VoiceMessage.h"
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+#include <algorithm>
+#include "PrivateChat.h"
+#include"ChatManager.h"
 using namespace std;
+
+string getCurrentTime() {
+    time_t now = time(nullptr);
+    tm* localTime = localtime(&now);
+
+    stringstream ss;
+    ss << put_time(localTime, "%Y-%m-%d %H:%M");
+    return ss.str();
+}
 
 LocalUser::LocalUser(const User& user) : User(user) {}
 
-void LocalUser::showDashboard(UserManager& userManager, ChatManager& chatManager) 
-{
+void LocalUser::showDashboard(UserManager& userManager, ChatManager& chatManager) {
     int choice = -1;
 
     while (choice != 0) {
         cout << "\nUSER DASHBOARD\n";
         cout << "Logged in as: " << username << "\n";
         cout << "1. View users\n";
-        cout << "2. creat privet chat\n";
+        cout << "2. Create private chat\n";
         cout << "3. View conversations\n";
         cout << "0. Logout\n";
         cout << "Choose: ";
@@ -24,19 +39,15 @@ void LocalUser::showDashboard(UserManager& userManager, ChatManager& chatManager
             case 1:
                 viewUsers(userManager);
                 break;
-
             case 2:
-                creatPrivetChat(userManager);
+                createPrivateChat(userManager, chatManager);
                 break;
-
             case 3:
-                viewConversations();
+                viewConversations(chatManager);
                 break;
-
             case 0:
                 logout();
                 break;
-
             default:
                 cout << "Invalid option.\n";
         }
@@ -53,34 +64,125 @@ void LocalUser::viewUsers(UserManager& userManager) const {
     }
 }
 
-void LocalUser::creatPrivetChat(UserManager& userManager) {
-    string receiverUsername, text, voice;
-    cout<<"chose type of message:"<<endl;
-    //? how shoulde i /
+void LocalUser::createPrivateChat(UserManager& userManager, ChatManager& chatManager) {
+    string receiverUsername;
     cout << "Receiver username: ";
     getline(cin, receiverUsername);
 
-    try {
-        auto* receiver = userManager.findUserInternal(receiverUsername);
-        if (!receiver) throw runtime_error("User not found");
-
-        cout << "Message text: ";
-        getline(cin, text);
-        // cout<<"Message voice:"<<endl;
-        // getline(cin,voice);
-        cout << "\n[TEXT MESSAGE SENT]\n";
-        cout << "From: " << username << "\n";
-        cout << "To: " << receiverUsername << "\n";
-        cout << "Content: " << text << "\n";
-
-    } catch (const exception& e) {
-        cout << "Error: " << e.what() << "\n";
+    User* receiver = userManager.findUserInternal(receiverUsername);
+    if (!receiver) {
+        cout << "User not found.\n";
+        return;
     }
+    PrivateChat* chat = nullptr;
+    auto conversations = chatManager.getUserConversations(this->id);
+    for (Conversation* c : conversations) {
+        auto participants = c->getParticipants();
+        if (participants.size() == 2 &&
+            ((participants[0] == this->id && participants[1] == receiver->getId()) ||
+             (participants[1] == this->id && participants[0] == receiver->getId()))) {
+            chat = dynamic_cast<PrivateChat*>(c);
+            break;
+        }
+    }
+
+    if (!chat) {
+        chat = chatManager.createPrivateChat(this->id, receiver->getId(), receiver->getUsername());
+        cout << "New private chat created.\n";
+    }
+
+    cout << "\n1. Text Message\n";
+    cout << "2. Voice Message\n";
+    cout << "Choose message type: ";
+    int choice;
+    cin >> choice;
+    cin.ignore();
+
+    Message* msg = nullptr;
+    string time = getCurrentTime();
+
+    if (choice == 1) {
+        string text;
+        cout << "Enter text: ";
+        getline(cin, text);
+        msg = new TextMessage(this->id, time, text);
+    } else if (choice == 2) {
+        string voiceDesc;
+        cout << "Enter voice description: ";
+        getline(cin, voiceDesc);
+        msg = new VoiceMessage(this->id, time, voiceDesc);
+    } else {
+        cout << "Invalid choice.\n";
+        return;
+    }
+
+    chat->addMessage(msg);
+    cout << "Message sent successfully.\n";
 }
 
-void LocalUser::viewConversations() const {
-    cout << "\n[CONVERSATIONS]\n";
-    cout << "No conversations yet.\n";
+void LocalUser::viewConversations(ChatManager& chatManager) {
+    auto conversations = chatManager.getUserConversations(this->id);
+    vector<PrivateChat*> privateChats;
+
+    for (Conversation* c : conversations) {
+        if (auto pc = dynamic_cast<PrivateChat*>(c)) {
+            privateChats.push_back(pc);
+        }
+    }
+
+    if (privateChats.empty()) {
+        cout << "No private chats found.\n";
+        return;
+    }
+
+    cout << "\nYOUR PRIVATE CHATS\n";
+    cout << "1. Show all\n";
+    cout << "2. Search by username\n";
+    cout << "3. Sort by username\n";
+    cout << "Choose: ";
+    int choice;
+    cin >> choice;
+    cin.ignore();
+
+    vector<PrivateChat*> filtered = privateChats;
+
+    if (choice == 2) {
+        string keyword;
+        cout << "Enter username to search: ";
+        getline(cin, keyword);
+        filtered.clear();
+        for (PrivateChat* pc : privateChats) {
+            if (pc->getName() == keyword || pc->getName().find(keyword) != string::npos) {
+                filtered.push_back(pc);
+            }
+        }
+    } else if (choice == 3) {
+        sort(filtered.begin(), filtered.end(),
+             [](PrivateChat* a, PrivateChat* b) {
+                 return a->getName() < b->getName();
+             });
+    }
+
+    if (filtered.empty()) {
+        cout << "No matching conversations.\n";
+        return;
+    }
+
+    cout << "\nConversations:\n";
+    for (size_t i = 0; i < filtered.size(); ++i) {
+        cout << i + 1 << ". " << filtered[i]->getName() << endl;
+    }
+
+    cout << "Select conversation number (0 to cancel): ";
+    int select;
+    cin >> select;
+    cin.ignore();
+
+    if (select <= 0 || select > (int)filtered.size())
+        return;
+
+    cout << "\nCHAT WITH " << filtered[select - 1]->getName() << "\n";
+    filtered[select - 1]->displayMessages();
 }
 
 void LocalUser::logout() {

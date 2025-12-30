@@ -16,6 +16,6 @@ public:
         return text;
     }
     void print() const;
-
+ std::string getType() const override;
 string toString() const override;
 };

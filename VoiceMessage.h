@@ -4,7 +4,8 @@
 
 class VoiceMessage : public Message {
 public:
-    VoiceMessage(int senderId, const std::string& sendTime);
+    VoiceMessage(int senderId, const string& time, const string& desc);
+
     ~VoiceMessage() override {}
 
     void print() const;

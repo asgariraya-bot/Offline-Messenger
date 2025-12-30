@@ -18,6 +18,16 @@ PrivateChat::PrivateChat(int conversationId, int user1Id, int user2Id, const std
     }
 }
 
+std::string PrivateChat::getChatName(int currentUserId) const {
+    if (participants.size() != 2)
+        return "Unknown";
+
+    if (participants[0] == currentUserId)
+        return name;  
+    else
+        return name;
+}
+
 void PrivateChat::addMessage(Message* msg) 
 {
     Conversation::addMessage(msg);

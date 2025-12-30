@@ -1,24 +1,20 @@
 #include "VoiceMessage.h"
 #include <iostream>
-#include <string>
 
 using namespace std;
 
-VoiceMessage::VoiceMessage(int senderId, const string& sendTime)
-    : Message(senderId, sendTime)
-{
-}
+VoiceMessage::VoiceMessage(int senderId, const string& time, const string& desc) : Message(senderId, time) {}
 
 void VoiceMessage::print() const {
-    cout << "[" << sendTime << "] "
-         << "User" << senderId << ": "
-         << "<Voice message>" << endl;
+    cout << "[Voice Message] Sent by user ID: " << senderId
+         << " at " << sendTime << endl;
 }
 
 string VoiceMessage::toString() const {
-    return "VOICE|" + to_string(senderId) + "|" + sendTime + "|<Voice message>";
+    return "[Voice Message] Sent by user ID: " + to_string(senderId) + 
+           " at " + sendTime;
 }
 
 string VoiceMessage::getType() const {
-    return "VOICE";
+    return "Voice";
 }

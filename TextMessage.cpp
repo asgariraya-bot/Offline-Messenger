@@ -4,6 +4,11 @@
 
 using namespace std;
 
+
+std::string TextMessage::getType() const 
+{
+    return "TEXT";
+}
 string TextMessage::toString() const
 {
     return "TEXT|" + to_string(senderId) + "|" + sendTime + "|" + text;
