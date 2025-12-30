@@ -2,9 +2,12 @@
 #include "Message.h"
 #include <string>
 
-class VoiceMessage : public Message {
+class VoiceMessage : public Message 
+{
+        std::string senderUsername;
+
 public:
-    VoiceMessage(int senderId, const string& time, const string& desc);
+VoiceMessage(int senderId, const std::string& time, const std::string& senderUsername);
 
     ~VoiceMessage() override {}
 

@@ -1,12 +1,17 @@
 #pragma once
 #include "Conversation.h"
-#include <vector>
-#include <stdexcept>
+#include <string>
 
-class PrivateChat : public Conversation {
+class PrivateChat : public Conversation 
+{
+private:
+    int user1Id, user2Id;
+    std::string user1Name, user2Name;
 public:
-    PrivateChat(int conversationId, int user1Id, int user2Id, const std::string& user2Name, const std::vector<Conversation*>& existingChats);
-    std::string getChatName(int currentUserId) const;
+    PrivateChat(int conversationId, int user1Id, const std::string& user1Name,int user2Id, const std::string& user2Name);
 
-    void addMessage(Message* msg);
+    std::string getChatName(int currentUserId) const override;
+    std::string getName() const override;
+    const std::vector<int>& getParticipants() const;
 };
+

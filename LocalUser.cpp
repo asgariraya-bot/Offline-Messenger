@@ -7,7 +7,7 @@
 #include <sstream>
 #include <algorithm>
 #include "PrivateChat.h"
-#include"ChatManager.h"
+#include "ChatManager.h"
 using namespace std;
 
 string getCurrentTime() {
@@ -36,20 +36,11 @@ void LocalUser::showDashboard(UserManager& userManager, ChatManager& chatManager
         cin.ignore();
 
         switch (choice) {
-            case 1:
-                viewUsers(userManager);
-                break;
-            case 2:
-                createPrivateChat(userManager, chatManager);
-                break;
-            case 3:
-                viewConversations(chatManager);
-                break;
-            case 0:
-                logout();
-                break;
-            default:
-                cout << "Invalid option.\n";
+            case 1: viewUsers(userManager); break;
+            case 2: createPrivateChat(userManager, chatManager); break;
+            case 3: viewConversations(chatManager); break;
+            case 0: logout(); break;
+            default: cout << "Invalid option.\n";
         }
     }
 }
@@ -64,7 +55,8 @@ void LocalUser::viewUsers(UserManager& userManager) const {
     }
 }
 
-void LocalUser::createPrivateChat(UserManager& userManager, ChatManager& chatManager) {
+void LocalUser::createPrivateChat(UserManager& userManager, ChatManager& chatManager) 
+{
     string receiverUsername;
     cout << "Receiver username: ";
     getline(cin, receiverUsername);
@@ -74,6 +66,7 @@ void LocalUser::createPrivateChat(UserManager& userManager, ChatManager& chatMan
         cout << "User not found.\n";
         return;
     }
+
     PrivateChat* chat = nullptr;
     auto conversations = chatManager.getUserConversations(this->id);
     for (Conversation* c : conversations) {
@@ -86,14 +79,13 @@ void LocalUser::createPrivateChat(UserManager& userManager, ChatManager& chatMan
         }
     }
 
-    if (!chat) {
-        chat = chatManager.createPrivateChat(this->id, receiver->getId(), receiver->getUsername());
+    if (!chat) 
+    {
+        chat = chatManager.createPrivateChat(this->id, this->username,  receiver->getId(), receiver->getUsername() );
         cout << "New private chat created.\n";
     }
 
-    cout << "\n1. Text Message\n";
-    cout << "2. Voice Message\n";
-    cout << "Choose message type: ";
+    cout << "\n1. Text Message\n2. Voice Message\nChoose message type: ";
     int choice;
     cin >> choice;
     cin.ignore();
@@ -106,11 +98,10 @@ void LocalUser::createPrivateChat(UserManager& userManager, ChatManager& chatMan
         cout << "Enter text: ";
         getline(cin, text);
         msg = new TextMessage(this->id, time, text);
+
     } else if (choice == 2) {
-        string voiceDesc;
-        cout << "Enter voice description: ";
-        getline(cin, voiceDesc);
-        msg = new VoiceMessage(this->id, time, voiceDesc);
+        msg = new VoiceMessage(this->id, time, this->username);
+
     } else {
         cout << "Invalid choice.\n";
         return;
@@ -136,10 +127,7 @@ void LocalUser::viewConversations(ChatManager& chatManager) {
     }
 
     cout << "\nYOUR PRIVATE CHATS\n";
-    cout << "1. Show all\n";
-    cout << "2. Search by username\n";
-    cout << "3. Sort by username\n";
-    cout << "Choose: ";
+    cout << "1. Show all\n2. Search by username\n3. Sort by username\nChoose: ";
     int choice;
     cin >> choice;
     cin.ignore();

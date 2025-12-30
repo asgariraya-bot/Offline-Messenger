@@ -3,17 +3,19 @@
 
 using namespace std;
 
-VoiceMessage::VoiceMessage(int senderId, const string& time, const string& desc) : Message(senderId, time) {}
+VoiceMessage::VoiceMessage(int senderId, const string& time, const string& username): Message(senderId, time), senderUsername(username) {}
 
-void VoiceMessage::print() const {
+void VoiceMessage::print() const 
+{
     cout << "[Voice Message] Sent by user ID: " << senderId
          << " at " << sendTime << endl;
 }
 
-string VoiceMessage::toString() const {
-    return "[Voice Message] Sent by user ID: " + to_string(senderId) + 
-           " at " + sendTime;
+std::string VoiceMessage::toString() const 
+{
+    return "[Voice Message] Sent by " + senderUsername + " at " + sendTime;
 }
+
 
 string VoiceMessage::getType() const {
     return "Voice";

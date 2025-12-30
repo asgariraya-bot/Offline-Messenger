@@ -85,12 +85,28 @@ vector<User> UserManager::getAllUsers() const
 {
     return users;
 }
-bool UserManager::isValidDate(const std::string& date) const {
+
+
+bool UserManager::isValidDate(const std::string& date) const
+{
     if (date.size() != 10) return false;
+
     if (date[4] != '-' || date[7] != '-') return false;
-    for (size_t i = 0; i < date.size(); ++i) {
-        if (i == 4 || i == 7) continue;
-        if (!isdigit(date[i])) return false;
+
+    int year = stoi(date.substr(0, 4));
+    int month = stoi(date.substr(5, 2));
+    int day = stoi(date.substr(8, 2));
+
+    if (year < 1900 || year > 2100) return false;
+    if (month < 1 || month > 12) return false;
+
+    int daysInMonth[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+    if (month == 2) {
+        bool leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+        if (leap) daysInMonth[1] = 29;
     }
+
+    if (day < 1 || day > daysInMonth[month - 1]) return false;
+
     return true;
 }

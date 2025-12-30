@@ -1,34 +1,20 @@
 #include "PrivateChat.h"
-#include <algorithm>
-#include <sstream>
 #include <iostream>
 
-using namespace std;
+PrivateChat::PrivateChat(int conversationId, int u1Id, const std::string& u1Name,  int u2Id, const std::string& u2Name)
+    : Conversation(conversationId, {u1Id, u2Id}, "private"), user1Id(u1Id), user1Name(u1Name),user2Id(u2Id), user2Name(u2Name) {}
 
-PrivateChat::PrivateChat(int conversationId, int user1Id, int user2Id, const std::string& user2Name, const std::vector<Conversation*>& existingChats)
-    : Conversation(conversationId, {user1Id, user2Id}, user2Name)
+std::string PrivateChat::getChatName(int currentUserId) const 
 {
-    for (const Conversation* chat : existingChats) 
-    {
-        const vector<int>& participants = chat->getParticipants();
-        if ((participants[0] == user1Id && participants[1] == user2Id) ||
-            (participants[0] == user2Id && participants[1] == user1Id)) {
-            throw runtime_error("Private chat between these users already exists.");
-        }
-    }
+    return (currentUserId == user1Id) ? user2Name : user1Name;
 }
 
-std::string PrivateChat::getChatName(int currentUserId) const {
-    if (participants.size() != 2)
-        return "Unknown";
-
-    if (participants[0] == currentUserId)
-        return name;  
-    else
-        return name;
+std::string PrivateChat::getName() const 
+{
+    return user1Name + " & " + user2Name;
 }
 
-void PrivateChat::addMessage(Message* msg) 
+const std::vector<int>& PrivateChat::getParticipants() const 
 {
-    Conversation::addMessage(msg);
+    return participants;
 }
