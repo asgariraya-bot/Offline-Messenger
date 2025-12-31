@@ -14,19 +14,24 @@ Conversation::~Conversation() {
     messages.clear();
 }
 
-int Conversation::getId() const {
+int Conversation::getId() const 
+{
     return conversationId;
 }
 
-string Conversation::getName() const {
+string Conversation::getName() const 
+{
     return name;
 }
 
-const vector<int>& Conversation::getParticipants() const {
+const vector<int>& Conversation::getParticipants() const 
+{
     return participants;
 }
 
-const vector<Message*>& Conversation::getMessages() const {
+const vector<Message*>& Conversation::getMessages() const
+
+{
     return messages;
 }
 
